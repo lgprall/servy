@@ -1,7 +1,8 @@
 defmodule Servy.Handler do
 
-  import Servy.Plugins, only: [log: 1, track: 1, rewrite_path: 1]
+ import Servy.Plugins, only: [log: 1, track: 1, rewrite_path: 1]
   import Servy.Parser, only: [parse: 1]
+  import Servy.Conv, only: [content_length: 1]
 
   alias Servy.Conv
   alias Servy.BearController
@@ -18,6 +19,7 @@ defmodule Servy.Handler do
     |> rewrite_path
     |> route
     |> track
+    |> content_length
     |> format_response
   end
 
@@ -61,14 +63,18 @@ defmodule Servy.Handler do
     BearController.index(conv)
   end
 
-  def route(%Conv{method: "GET", path:  "/api/bears"} = conv  ) do
-    Servy.Api.BearController.index(conv)
-  end
-
   def route(%Conv{method: "POST", path: "/bears"} = conv ) do
     BearController.create(conv, conv.params)
   end
 
+  def route(%Conv{method: "GET", path:  "/api/bears"} = conv  ) do
+    Servy.Api.BearController.index(conv)
+  end
+
+  def route(%Conv{method: "POST", path:  "/api/bears"} = conv  ) do
+    Servy.Api.BearController.create(conv)
+  end
+ 
   def route(%Conv{method: "GET", path: "/bears/new"} = conv) do
     file = @pages_path
         |> Path.join("form.html")
@@ -76,7 +82,7 @@ defmodule Servy.Handler do
     handle_file(result, conv)
   end
 
-  def route(%{method: "GET", path:  "/bears/" <> id} = conv  ) do
+  def route(%{method: "GET", path:  "/bear/" <> id} = conv  ) do
     if Integer.parse(id) != :error do
     params = Map.put(conv.params, "id", id)
     BearController.show(conv, params)
@@ -88,16 +94,19 @@ defmodule Servy.Handler do
   def route(%Conv{ path: path} = conv) do
     if target =  Regex.named_captures(~r/(?<thing>\w+)\/(?<id>\d+)/, path) do
       thing = target["thing"]; id = target["id"]
-      thing = thing
-              |> String.reverse
+      thing = thing |> String.capitalize
+      if Regex.match?(~r/s$/, thing) do
+        t = thing|> String.reverse
               |> String.to_charlist
               |> tl
               |> List.to_string
               |> String.reverse
-              |> String.capitalize
-    %{ conv | status: 200, resp_body: "#{thing} #{id}" }
+        %{ conv | status: 200, resp_body: "#{t} #{id}\n" }
+      else
+        %{ conv | status: 200, resp_body: "#{thing} #{id}\n" }
+      end
     else
-    %{ conv | status: 404, resp_body: "No #{path} here!"}
+    %{ conv | status: 404, resp_body: "No #{path} here!\n"}
     end
   end
 
@@ -122,8 +131,8 @@ defmodule Servy.Handler do
   def format_response(%Conv{} = conv) do
     """
     HTTP/1.1 #{Conv.full_status(conv)}\r
-    Content-Type: #{conv.resp_content_type}\r
-    Content-Length: #{String.length(conv.resp_body)}\r
+    Content-Type: #{conv.resp_headers["Content-Type"]}\r
+    Content-Length: #{conv.resp_headers["Content-Length"]}\r
     \r
     #{conv.resp_body}
     """
