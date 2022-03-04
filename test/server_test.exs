@@ -1,11 +1,12 @@
-defmodule HandlerTest do
+defmodule ServerTest do
   use ExUnit.Case
   doctest Servy
+  
+  alias Servy.HttpClient
 
-  import Servy.Handler, only: [handle: 1]
+  spawn Servy.HttpServer, :start, [4000]
 
-  test "GET /wildthings " do
-
+  test "wildthings" do
     request = """ 
     GET /wildthings HTTP/1.1\r
     Host: example.com\r
@@ -13,8 +14,7 @@ defmodule HandlerTest do
     Accept: */*\r
     \r
     """
-
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 200 OK\r
@@ -23,9 +23,10 @@ defmodule HandlerTest do
     \r
     Bears, Lions, Tigers
     """
+
   end
 
-  test "GET /wildlife" do
+  test "wildlife" do
     request = """ 
     GET /wildlife HTTP/1.1\r
     Host: example.com\r
@@ -34,7 +35,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 200 OK\r
@@ -45,8 +46,7 @@ defmodule HandlerTest do
     """
   end
 
-  test "DELETE /bears/1" do
-
+  test "DELETE" do
     request = """
     DELETE /bear/1 HTTP/1.1\r
     Host: example.com\r
@@ -55,7 +55,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 403 Forbidden\r
@@ -65,8 +65,8 @@ defmodule HandlerTest do
     You are not allowed to delete an animal.
     """
   end
-
-  test "GET /bears" do
+  
+  test "/bears" do
     request = """ 
     GET /bears HTTP/1.1\r
     Host: example.com\r
@@ -75,7 +75,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     expected_response = """
     HTTP/1.1 200 OK\r
@@ -85,35 +85,33 @@ defmodule HandlerTest do
       <h1>All The Bears!</h1>
 
       <ul>
-
+	  
           <li>(6) - Brutus  - Grizzly </li>
-
+        
           <li>(9) - Iceman  - Polar </li>
-
+        
           <li>(10) - Kenai  - Grizzly </li>
-
+        
           <li>(3) - Paddington  - Brown </li>
-
+        
           <li>(8) - Roscoe  - Panda </li>
-
+        
           <li>(7) - Rosie  - Black </li>
-
+        
           <li>(4) - Scarface  - Grizzly </li>
-
+        
           <li>(2) - Smokey  - Black </li>
-
+        
           <li>(5) - Snow  - Polar </li>
-
+        
           <li>(1) - Teddy  - Brown </li>
-
+        
       </ul>
-
     """
-
     assert remove_whitespace(response) == remove_whitespace(expected_response)
   end
 
-  test "GET /bear/1" do
+  test "/bear/1" do
 
     request = """ 
     GET /bear/1 HTTP/1.1\r
@@ -123,7 +121,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response === """
     HTTP/1.1 200 OK\r
@@ -136,8 +134,8 @@ defmodule HandlerTest do
 
     """
   end
-  
-  test "GET /bear?id=6" do
+
+  test "/bear?id=6" do
     request = """ 
     GET /bear?id=6 HTTP/1.1\r
     Host: example.com\r
@@ -146,7 +144,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 200 OK\r
@@ -160,7 +158,7 @@ defmodule HandlerTest do
     """
   end
 
-  test "GET /bear/two" do
+  test "/bear/two" do
     request = """ 
     GET /bear/two HTTP/1.1\r
     Host: example.com\r
@@ -169,7 +167,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 403 Forbidden\r
@@ -190,7 +188,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response === """
     HTTP/1.1 404 Not Found\r
@@ -211,7 +209,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 200 OK\r
@@ -231,7 +229,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 200 OK\r
@@ -251,7 +249,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 200 OK\r
@@ -280,7 +278,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 200 OK\r
@@ -315,7 +313,7 @@ defmodule HandlerTest do
     """
 
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 200 OK\r
@@ -336,7 +334,7 @@ defmodule HandlerTest do
     \r
     """
         
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 200 OK\r
@@ -368,7 +366,7 @@ defmodule HandlerTest do
     </ul>
 
     """
-  end
+      end
 
   test "POST /bears" do
 
@@ -383,7 +381,7 @@ defmodule HandlerTest do
     name=Baloo&type=Brown
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     assert response == """
     HTTP/1.1 201 Created\r
@@ -403,7 +401,7 @@ defmodule HandlerTest do
     \r
     """
 
-    response = handle(request)
+    response = HttpClient.send_request(request)
 
     expected_response = """
     HTTP/1.1 200 OK\r
@@ -423,9 +421,9 @@ defmodule HandlerTest do
     """
 
     assert remove_whitespace(response) == remove_whitespace(expected_response)
-	end
+  end
 
-	test "POST /api/bears" do
+  test "POST /api/bears" do
 	request = """
 	POST /api/bears HTTP/1.1\r
 	Host: example.com\r
@@ -437,7 +435,7 @@ defmodule HandlerTest do
 	{"name": "Breezly", "type": "Polar"}
 	"""
 
-	response = handle(request)
+	response = HttpClient.send_request(request)
 
 	assert response == """
 	HTTP/1.1 201 Created\r

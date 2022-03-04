@@ -1,11 +1,12 @@
 defmodule Servy.Handler do
 
- import Servy.Plugins, only: [log: 1, track: 1, rewrite_path: 1]
+  import Servy.Plugins, only: [log: 1, track: 1, rewrite_path: 1]
   import Servy.Parser, only: [parse: 1]
   import Servy.Conv, only: [content_length: 1]
 
   alias Servy.Conv
   alias Servy.BearController
+  alias Servy.VideoCam
 
   @moduledoc "Handles HTTP requests."
 
@@ -23,7 +24,26 @@ defmodule Servy.Handler do
     |> format_response
   end
 
-  def route(%Conv{method: "DELETE", path: "/bears/" <> _id} = conv) do
+  def route(%Conv{method: "GET", path: "/snapshots" } = conv) do
+    snapshot1 = VideoCam.get_snapshot("cam-1")
+    snapshot2 = VideoCam.get_snapshot("cam-2")
+    snapshot3 = VideoCam.get_snapshot("cam-3")
+
+    snapshots = [snapshot1, snapshot2, snapshot3]
+    %{conv | status: 200, resp_body: inspect(snapshots)}
+  end
+
+  def route(%Conv{method: "GET", path: "/kaboom" }= _conv) do
+    raise("Kaboom!")
+  end
+
+  def route(%Conv{method: "GET", path: "/hibernate/" <> time} = conv) do
+    String.to_integer(time) |> :timer.sleep
+    %{ conv | status: 200, resp_body: "Awake!" }
+  end
+
+  def route(%Conv{method: "DELETE", path: "/bear/" <> _id} = conv) do
+    IO.inspect(conv)
     BearController.delete(conv)
   end
   
@@ -42,16 +62,19 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{method: "GET", path: "/pages/" <> target} = conv) do
-    file = @pages_path
-        |> Path.join(target)
-      
-    case File.read(file) do
-      {:ok, contents } ->
-        %{ conv | status: 200, resp_body: contents }
-      {:error, :enoent } ->
-        %{ conv | status: 404, resp_body: "File not found!" }
-      {:error, reason }  ->
-        %{ conv | status: 500, resp_body: "System error: #{reason}" }
+    if Regex.match?(~r/\.md$/, target) do
+      proc_markdown(conv, target)
+    else
+      file = @pages_path
+          |> Path.join(target)
+      case File.read(file) do
+        {:ok, contents } ->
+          %{ conv | status: 200, resp_body: contents }
+        {:error, :enoent } ->
+          %{ conv | status: 404, resp_body: "File not found!" }
+        {:error, reason }  ->
+          %{ conv | status: 500, resp_body: "System error: #{reason}" }
+      end
     end
   end
 
@@ -83,12 +106,13 @@ defmodule Servy.Handler do
   end
 
   def route(%{method: "GET", path:  "/bear/" <> id} = conv  ) do
-    if Integer.parse(id) != :error do
-    params = Map.put(conv.params, "id", id)
-    BearController.show(conv, params)
+    if Integer.parse(id) != :error and String.to_integer(id) <= Enum.count(Servy.Wildthings.list_bears) do
+      params = Map.put(conv.params, "id", id)
+      BearController.show(conv, params)
     else
-      %{conv | status: 403, resp_body: "Invalid query: #{id}"}
+        %{conv | status: 403, resp_body: "Invalid query: #{id}"}
     end
+
   end
 
   def route(%Conv{ path: path} = conv) do
@@ -101,20 +125,21 @@ defmodule Servy.Handler do
               |> tl
               |> List.to_string
               |> String.reverse
-        %{ conv | status: 200, resp_body: "#{t} #{id}\n" }
+        %{ conv | status: 200, resp_body: "#{t} #{id}" }
       else
-        %{ conv | status: 200, resp_body: "#{thing} #{id}\n" }
+        %{ conv | status: 200, resp_body: "#{thing} #{id}" }
       end
     else
-    %{ conv | status: 404, resp_body: "No #{path} here!\n"}
+    %{ conv | status: 404, resp_body: "No #{path} here!"}
     end
   end
 
-
-
-#  def route(%{ path:  path} = conv  )do
-#   %{ conv | status: 404, resp_body: "No #{path} here!"}
-#  end
+  def proc_markdown(conv, target) do
+    file = @pages_path |> Path.join(target)
+    contents = File.read!(file)
+                |> Earmark.as_html!(%Earmark.Options{smartypants: false})
+    %{ conv | status: 200, resp_body: contents }
+  end
 
   def handle_file({:error, :enoent}, conv ) do
     %{conv | status: 404, resp_body: "File not found!" }
@@ -139,3 +164,4 @@ defmodule Servy.Handler do
   end
 
 end
+
