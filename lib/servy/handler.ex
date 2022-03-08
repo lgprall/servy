@@ -24,13 +24,17 @@ defmodule Servy.Handler do
     |> format_response
   end
 
-  def route(%Conv{method: "GET", path: "/snapshots" } = conv) do
-    snapshot1 = VideoCam.get_snapshot("cam-1")
-    snapshot2 = VideoCam.get_snapshot("cam-2")
-    snapshot3 = VideoCam.get_snapshot("cam-3")
+  def route(%Conv{method: "GET", path: "/sensors" } = conv) do
 
-    snapshots = [snapshot1, snapshot2, snapshot3]
-    %{conv | status: 200, resp_body: inspect(snapshots)}
+    task = Task.async(Servy.Tracker, :get_location,["bigfoot"])
+    snapshots =
+    ["cam-1","cam-2","cam-3"]
+    |> Enum.map(&Task.async(VideoCam, :get_snapshot,[&1]))
+    |> Enum.map(&Task.await/1)
+
+    where_is_bigfoot = Task.await(task)
+
+    %{conv | status: 200, resp_body: inspect({snapshots, where_is_bigfoot})}
   end
 
   def route(%Conv{method: "GET", path: "/kaboom" }= _conv) do

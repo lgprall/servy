@@ -5,8 +5,7 @@ defmodule HandlerTest do
   import Servy.Handler, only: [handle: 1]
 
   test "GET /wildthings " do
-
-    request = """ 
+    request = """
     GET /wildthings HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser 1.0\r
@@ -17,16 +16,16 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 200 OK\r
-    Content-Type: text/html\r
-    Content-Length: 20\r
-    \r
-    Bears, Lions, Tigers
-    """
+           HTTP/1.1 200 OK\r
+           Content-Type: text/html\r
+           Content-Length: 20\r
+           \r
+           Bears, Lions, Tigers
+           """
   end
 
   test "GET /wildlife" do
-    request = """ 
+    request = """
     GET /wildlife HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -37,16 +36,15 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 200 OK\r
-    Content-Type: text/html\r
-    Content-Length: 20\r
-    \r
-    Bears, Lions, Tigers
-    """
+           HTTP/1.1 200 OK\r
+           Content-Type: text/html\r
+           Content-Length: 20\r
+           \r
+           Bears, Lions, Tigers
+           """
   end
 
   test "DELETE /bears/1" do
-
     request = """
     DELETE /bear/1 HTTP/1.1\r
     Host: example.com\r
@@ -58,16 +56,16 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 403 Forbidden\r
-    Content-Type: text/html\r
-    Content-Length: 40\r
-    \r
-    You are not allowed to delete an animal.
-    """
+           HTTP/1.1 403 Forbidden\r
+           Content-Type: text/html\r
+           Content-Length: 40\r
+           \r
+           You are not allowed to delete an animal.
+           """
   end
 
   test "GET /bears" do
-    request = """ 
+    request = """
     GET /bears HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -114,8 +112,7 @@ defmodule HandlerTest do
   end
 
   test "GET /bear/1" do
-
-    request = """ 
+    request = """
     GET /bear/1 HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -126,19 +123,19 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response === """
-    HTTP/1.1 200 OK\r
-    Content-Type: text/html\r
-    Content-Length: 71\r
-    \r
-    <h1>Show Bear</h1>
-    <p>Is Teddy hibernating? <strong>true</strong>
-    </p>
+           HTTP/1.1 200 OK\r
+           Content-Type: text/html\r
+           Content-Length: 71\r
+           \r
+           <h1>Show Bear</h1>
+           <p>Is Teddy hibernating? <strong>true</strong>
+           </p>
 
-    """
+           """
   end
-  
+
   test "GET /bear?id=6" do
-    request = """ 
+    request = """
     GET /bear?id=6 HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -149,19 +146,19 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 200 OK\r
-    Content-Type: text/html\r
-    Content-Length: 73\r
-    \r
-    <h1>Show Bear</h1>
-    <p>Is Brutus hibernating? <strong>false</strong>
-    </p>
+           HTTP/1.1 200 OK\r
+           Content-Type: text/html\r
+           Content-Length: 73\r
+           \r
+           <h1>Show Bear</h1>
+           <p>Is Brutus hibernating? <strong>false</strong>
+           </p>
 
-    """
+           """
   end
 
   test "GET /bear/two" do
-    request = """ 
+    request = """
     GET /bear/two HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -172,17 +169,16 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 403 Forbidden\r
-    Content-Type: text/html\r
-    Content-Length: 18\r
-    \r
-    Invalid query: two
-    """
+           HTTP/1.1 403 Forbidden\r
+           Content-Type: text/html\r
+           Content-Length: 18\r
+           \r
+           Invalid query: two
+           """
   end
 
   test "GET /bigfoot" do
-
-    request = """ 
+    request = """
     GET /bigfoot HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -193,17 +189,16 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response === """
-    HTTP/1.1 404 Not Found\r
-    Content-Type: text/html\r
-    Content-Length: 17\r
-    \r
-    No /bigfoot here!
-    """
+           HTTP/1.1 404 Not Found\r
+           Content-Type: text/html\r
+           Content-Length: 17\r
+           \r
+           No /bigfoot here!
+           """
   end
 
   test "GET /lions 2" do
-
-    request = """ 
+    request = """
     GET /lions/2 HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -214,16 +209,16 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 200 OK\r
-    Content-Type: text/html\r
-    Content-Length: 6\r
-    \r
-    Lion 2
-    """
+           HTTP/1.1 200 OK\r
+           Content-Type: text/html\r
+           Content-Length: 6\r
+           \r
+           Lion 2
+           """
   end
 
   test "GET /tigers?id=4" do
-    request = """ 
+    request = """
     GET /tigers?id=4 HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -234,16 +229,16 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 200 OK\r
-    Content-Type: text/html\r
-    Content-Length: 7\r
-    \r
-    Tiger 4
-    """
+           HTTP/1.1 200 OK\r
+           Content-Type: text/html\r
+           Content-Length: 7\r
+           \r
+           Tiger 4
+           """
   end
 
   test "GET /about" do
-    request = """ 
+    request = """
     GET /about HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -254,25 +249,25 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 200 OK\r
-    Content-Type: text/html\r
-    Content-Length: 324\r
-    \r
-    <h1>Clark's Wildthings Refuge</h1>
+           HTTP/1.1 200 OK\r
+           Content-Type: text/html\r
+           Content-Length: 324\r
+           \r
+           <h1>Clark's Wildthings Refuge</h1>
 
-    <blockquote>
-    When we contemplate the whole globe as one great dewdrop, 
-    striped and dotted with continents and islands, flying through 
-    space with other stars all singing and shining together as one, 
-    the whole universe appears as an infinite storm of beauty. 
-    -- John Muir
-    </blockquote>
+           <blockquote>
+           When we contemplate the whole globe as one great dewdrop, 
+           striped and dotted with continents and islands, flying through 
+           space with other stars all singing and shining together as one, 
+           the whole universe appears as an infinite storm of beauty. 
+           -- John Muir
+           </blockquote>
 
-    """
+           """
   end
 
   test "/bears/new" do
-    request = """ 
+    request = """
     GET /bears/new HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -283,30 +278,29 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 200 OK\r
-    Content-Type: text/html\r
-    Content-Length: 240\r
-    \r
-    <form action="/bears" method="POST">
-      <p>
-        Name:<br/>
-        <input type="text" name="name">    
-      </p>
-      <p>
-        Type:<br/>
-        <input type="text" name="type">    
-      </p>
-      <p>
-        <input type="submit" value="Create Bear">
-      </p>
-    </form>
+           HTTP/1.1 200 OK\r
+           Content-Type: text/html\r
+           Content-Length: 240\r
+           \r
+           <form action="/bears" method="POST">
+             <p>
+               Name:<br/>
+               <input type="text" name="name">    
+             </p>
+             <p>
+               Type:<br/>
+               <input type="text" name="type">    
+             </p>
+             <p>
+               <input type="submit" value="Create Bear">
+             </p>
+           </form>
 
-    """
+           """
   end
 
   test "GET/pages/contacts" do
-
-    request = """ 
+    request = """
     GET /pages/contacts HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -314,65 +308,63 @@ defmodule HandlerTest do
     \r
     """
 
-
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 200 OK\r
-    Content-Type: text/html\r
-    Content-Length: 16\r
-    \r
-    Contact data...
+           HTTP/1.1 200 OK\r
+           Content-Type: text/html\r
+           Content-Length: 16\r
+           \r
+           Contact data...
 
-    """
+           """
   end
 
   test "GET /pages/faq.md" do
-    request = """ 
+    request = """
     GET /pages/faq.md HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
     Accept: */*\r
     \r
     """
-        
+
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 200 OK\r
-    Content-Type: text/html\r
-    Content-Length: 664\r
-    \r
-    <h1>
-    Frequently Asked Questions</h1>
-    <ul>
-      <li>
-        <p>
-    <strong>Have you really seen Bigfoot?</strong>    </p>
-        <p>
-      Yes! In this <a href="https://www.youtube.com/watch?v=v77ijOO8oAk">totally believable video</a>!    </p>
-      </li>
-      <li>
-        <p>
-    <strong>No, I mean seen Bigfoot <em>on the refuge</em>?</strong>    </p>
-        <p>
-      Oh! Not yet, but we&#39;re <em>still looking</em>...    </p>
-      </li>
-      <li>
-        <p>
-    <strong>Can you just show me some code?</strong>    </p>
-        <p>
-      Sure! Here&#39;s some Elixir:    </p>
-        <pre><code class="elixir">  [&quot;Bigfoot&quot;, &quot;Yeti&quot;, &quot;Sasquatch&quot;] |&gt; Enum.random()</code></pre>
-      </li>
-    </ul>
+           HTTP/1.1 200 OK\r
+           Content-Type: text/html\r
+           Content-Length: 664\r
+           \r
+           <h1>
+           Frequently Asked Questions</h1>
+           <ul>
+             <li>
+               <p>
+           <strong>Have you really seen Bigfoot?</strong>    </p>
+               <p>
+             Yes! In this <a href="https://www.youtube.com/watch?v=v77ijOO8oAk">totally believable video</a>!    </p>
+             </li>
+             <li>
+               <p>
+           <strong>No, I mean seen Bigfoot <em>on the refuge</em>?</strong>    </p>
+               <p>
+             Oh! Not yet, but we&#39;re <em>still looking</em>...    </p>
+             </li>
+             <li>
+               <p>
+           <strong>Can you just show me some code?</strong>    </p>
+               <p>
+             Sure! Here&#39;s some Elixir:    </p>
+               <pre><code class="elixir">  [&quot;Bigfoot&quot;, &quot;Yeti&quot;, &quot;Sasquatch&quot;] |&gt; Enum.random()</code></pre>
+             </li>
+           </ul>
 
-    """
+           """
   end
 
   test "POST /bears" do
-
-    request = """ 
+    request = """
     POST /bears HTTP/1.1\r
     Host: example.com\r
     User-Agent: ExampleBrowser/1.0\r
@@ -386,12 +378,12 @@ defmodule HandlerTest do
     response = handle(request)
 
     assert response == """
-    HTTP/1.1 201 Created\r
-    Content-Type: text/html\r
-    Content-Length: 32\r
-    \r
-    Create a Brown bear named Baloo!
-    """
+           HTTP/1.1 201 Created\r
+           Content-Type: text/html\r
+           Content-Length: 32\r
+           \r
+           Create a Brown bear named Baloo!
+           """
   end
 
   test "GET /api/bears" do
@@ -423,32 +415,32 @@ defmodule HandlerTest do
     """
 
     assert remove_whitespace(response) == remove_whitespace(expected_response)
-	end
+  end
 
-	test "POST /api/bears" do
-	request = """
-	POST /api/bears HTTP/1.1\r
-	Host: example.com\r
-	User-Agent: ExampleBrowser/1.0\r
-	Accept: */*\r
-	Content-Type: application/json\r
-	Content-Length: 21\r
-	\r
-	{"name": "Breezly", "type": "Polar"}
-	"""
+  test "POST /api/bears" do
+    request = """
+    POST /api/bears HTTP/1.1\r
+    Host: example.com\r
+    User-Agent: ExampleBrowser/1.0\r
+    Accept: */*\r
+    Content-Type: application/json\r
+    Content-Length: 21\r
+    \r
+    {"name": "Breezly", "type": "Polar"}
+    """
 
-	response = handle(request)
+    response = handle(request)
 
-	assert response == """
-	HTTP/1.1 201 Created\r
-	Content-Type: text/html\r
-	Content-Length: 35\r
-	\r
-	Created a Polar bear named Breezly!
-	"""
+    assert response == """
+           HTTP/1.1 201 Created\r
+           Content-Type: text/html\r
+           Content-Length: 35\r
+           \r
+           Created a Polar bear named Breezly!
+           """
   end
 
   defp remove_whitespace(text) do
     String.replace(text, ~r{\s}, "")
-  end 
+  end
 end
