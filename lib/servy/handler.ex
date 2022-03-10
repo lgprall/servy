@@ -141,7 +141,7 @@ defmodule Servy.Handler do
   def proc_markdown(conv, target) do
     file = @pages_path |> Path.join(target)
     contents = File.read!(file)
-                |> Earmark.as_html!(%Earmark.Options{smartypants: false})
+                |> Earmark.as_html!
     %{ conv | status: 200, resp_body: contents }
   end
 
