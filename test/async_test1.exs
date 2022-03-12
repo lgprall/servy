@@ -9,8 +9,8 @@ defmodule ServerTest1 do
 
     for _ <- 1..5 do
       spawn(fn ->
-        {:ok, response} = HTTPoison.get("http://localhost:4000/wildthings")
-        send(parent, {:ok, response})
+        response = HTTPoison.get("http://localhost:4000/wildthings")
+        send(parent, response)
       end)
     end
 

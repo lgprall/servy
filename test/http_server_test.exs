@@ -1,6 +1,7 @@
 defmodule HttpServerTest do
   use ExUnit.Case
   doctest Servy
+  import Servy.Handler, only: [handle: 1]
 
   spawn(Servy.HttpServer, :start, [4000])
 
@@ -173,36 +174,48 @@ defmodule HttpServerTest do
   end
 
   test "GET /pages/faq.md" do
-    response = HTTPoison.get!("http://localhost:4000/pages/faq.md")
+    request = """
+    GET /pages/faq.md HTTP/1.1\r
+    Host: example.com\r
+    User-Agent: ExampleBrowser/1.0\r
+    Accept: */*\r
+    \r
+    """
 
-    assert response.headers == [{"Content-Type", "text/html"}, {"Content-Length", "664"}]
-    assert response.status_code == 200
+    response = handle(request)
 
-    assert response.body == """
-           <h1>
-           Frequently Asked Questions</h1>
-           <ul>
-             <li>
-               <p>
-           <strong>Have you really seen Bigfoot?</strong>    </p>
-               <p>
-             Yes! In this <a href="https://www.youtube.com/watch?v=v77ijOO8oAk">totally believable video</a>!    </p>
-             </li>
-             <li>
-               <p>
-           <strong>No, I mean seen Bigfoot <em>on the refuge</em>?</strong>    </p>
-               <p>
-             Oh! Not yet, but we&#39;re <em>still looking</em>...    </p>
-             </li>
-             <li>
-               <p>
-           <strong>Can you just show me some code?</strong>    </p>
-               <p>
-             Sure! Here&#39;s some Elixir:    </p>
-               <pre><code class="elixir">  [&quot;Bigfoot&quot;, &quot;Yeti&quot;, &quot;Sasquatch&quot;] |&gt; Enum.random()</code></pre>
-             </li>
-           </ul>
-           """
+    expected_response = """
+           HTTP/1.1 200 OK\r
+           Content-Type: text/html\r
+           Content-Length: 654\r
+           \r
+          <h1>
+          Frequently Asked Questions</h1>
+          <ul>
+            <li>
+              <p>
+                <strong>Have you really seen Bigfoot?</strong>    </p>
+              <p>
+            Yes! In this <a href="https://www.youtube.com/watch?v=v77ijOO8oAk">totally believable video</a>!    </p>
+            </li>
+            <li>
+              <p>
+                <strong>No, I mean seen Bigfoot <em>on the refuge</em>?</strong>    </p>
+              <p>
+                Oh! Not yet, but we’re <em>still looking</em>…    </p>
+            </li>
+            <li>
+              <p>
+                <strong>Can you just show me some code?</strong>    </p>
+              <p>
+                  Sure! Here’s some Elixir:    </p>
+                  <pre><code class="elixir">  [&quot;Bigfoot&quot;, &quot;Yeti&quot;, &quot;Sasquatch&quot;] |&gt; Enum.random()</code></pre>
+            </li>
+          </ul>
+
+          """
+    assert remove_whitespace(response) == remove_whitespace(expected_response)
+
   end
 
   test "POST /bears" do

@@ -18,17 +18,13 @@ defmodule ServerTestx do
       spawn(fn ->
         send(
           parent,
-          {:ok, HTTPoison.get!(url)}
+          HTTPoison.get(url)
         )
-      end)
-    end
-
-    for _ <- 1..5 do
-      receive do
-        {:ok, message} ->
-          message
+        receive do
+          {:ok, message} -> 
           assert message.status_code == 200
-      end
+        end
+      end)
     end
   end
 end
