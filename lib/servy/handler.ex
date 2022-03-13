@@ -142,8 +142,8 @@ defmodule Servy.Handler do
     file = @pages_path |> Path.join(target)
     contents = File.read!(file)
                 |> Earmark.as_html!
-    pfix = ~s(<meta charset="UTF-8">\n)
-    %{ conv | status: 200, resp_body: contents }
+    pfix = utf(Regex.match?(~r/iPad/, conv.headers["User-Agent"]))
+    %{ conv | status: 200, resp_body: pfix <> contents }
   end
 
   def handle_file({:error, :enoent}, conv ) do
@@ -167,6 +167,9 @@ defmodule Servy.Handler do
     #{conv.resp_body}
     """
   end
-
+  
+ defp utf(true), do: ~s(<meta charset="UTF-8">\n)
+ defp utf(   _), do: ""
+ 
 end
 
